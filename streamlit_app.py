@@ -37,6 +37,60 @@ def fetch_pdb_text(pdb_id: str) -> str:
     with urllib.request.urlopen(url, timeout=30) as resp:
         return resp.read().decode("utf-8", errors="ignore")
 
+import math
+
+def split_pdb_protein_ligand(pdb_text: str) -> tuple[str, str]:
+    """Return (protein_pdb, ligand_pdb) strings; ligand excludes waters."""
+    prot = []
+    lig = []
+    for ln in pdb_text.splitlines():
+        if ln.startswith("ATOM"):
+            prot.append(ln)
+        elif ln.startswith("HETATM"):
+            resn = ln[17:20].strip().upper()
+            if resn != "HOH":
+                lig.append(ln)
+    # 3Dmol likes explicit END
+    return ("\n".join(prot) + "\nEND\n") if prot else "", ("\n".join(lig) + "\nEND\n") if lig else ""
+
+def deg2rad(d: float) -> float:
+    return d * math.pi / 180.0
+
+def compose_trs_matrix(tx: float, ty: float, tz: float, rx_deg: float, ry_deg: float, rz_deg: float):
+    """
+    Build a 4x4 column-major transform matrix matching 3Dmol.js expectations.
+    Rotation order: Rz * Ry * Rx, then translate (tx, ty, tz) in Å.
+    """
+    rx, ry, rz = deg2rad(rx_deg), deg2rad(ry_deg), deg2rad(rz_deg)
+    cx, sx = math.cos(rx), math.sin(rx)
+    cy, sy = math.cos(ry), math.sin(ry)
+    cz, sz = math.cos(rz), math.sin(rz)
+
+    # Rotation matrices (row-major here)
+    Rx = [[1, 0, 0],
+          [0, cx, -sx],
+          [0, sx,  cx]]
+    Ry = [[ cy, 0, sy],
+          [  0, 1,  0],
+          [-sy, 0, cy]]
+    Rz = [[cz, -sz, 0],
+          [sz,  cz, 0],
+          [ 0,   0, 1]]
+
+    def matmul3(A,B):
+        return [[sum(A[i][k]*B[k][j] for k in range(3)) for j in range(3)] for i in range(3)]
+
+    R = matmul3(matmul3(Rz, Ry), Rx)
+
+    # 4x4 column-major as list of 16 values (what 3Dmol expects)
+    # [ r00 r10 r20 0  r01 r11 r21 0  r02 r12 r22 0  tx ty tz 1 ]
+    m = [
+        R[0][0], R[1][0], R[2][0], 0.0,
+        R[0][1], R[1][1], R[2][1], 0.0,
+        R[0][2], R[1][2], R[2][2], 0.0,
+        tx,      ty,      tz,      1.0,
+    ]
+    return m
 
 def parse_structure_atoms(pdb_text: str):
     parser = PDBParser(QUIET=True)
@@ -253,6 +307,7 @@ st.markdown("""---
 • Adjust the hydrogen-bond cutoff to explore more/less interactions. 
 • Use *Use tube fallback* if cartoons don’t render on your device.
 """)
+
 
 
 
