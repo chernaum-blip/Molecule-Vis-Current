@@ -309,65 +309,6 @@ if (uploaded is not None) or run_btn or ("_ran_once" not in st.session_state):
     if show_disulfides:
         st.caption(f"Disulfide pairs detected: {len(ss_pairs)}")
 
-def render_view(pdb_text: str, cutoff_ang: float = 3.5, use_tube=False, show_ss=True,
-                lig_tx=0.0, lig_ty=0.0, lig_tz=0.0, lig_rx=0.0, lig_ry=0.0, lig_rz=0.0):
-    hbonds, bonded_residues, ss_pairs = compute_hbonds_and_ss(pdb_text, cutoff_ang=cutoff_ang)
-
-    # Split into two PDBs so we can transform ligand independently
-    prot_pdb, lig_pdb = split_pdb_protein_ligand(pdb_text)
-
-    chains = polymer_chains_from_pdb_text(pdb_text)
-    view = py3Dmol.view(width=1000, height=700)
-    view.setBackgroundColor("#111731")
-
-    # Add models in fixed order: 0 = protein, 1 = ligand (if present)
-    if prot_pdb:
-        view.addModel(prot_pdb, "pdb")     # model 0
-    if lig_pdb:
-        view.addModel(lig_pdb, "pdb")      # model 1
-
-    # Styles
-    if use_tube:
-        for ch in (chains or ['A']):
-            view.setStyle({"model": 0, "chain": ch}, {"tube": {"radius": 0.5, "color": "spectrum"}})
-    else:
-        for ch in (chains or ['A']):
-            view.setStyle({"model": 0, "chain": ch}, {"cartoon": {"color": "spectrum"}})
-
-    if lig_pdb:
-        view.setStyle({"model": 1}, {"stick": {"colorscheme": "cyanCarbon", "radius": 0.28}})
-
-    # Apply ligand transform (translate/rotate) if there is a ligand
-    if lig_pdb:
-        M = compose_trs_matrix(lig_tx, lig_ty, lig_tz, lig_rx, lig_ry, lig_rz)
-        # py3Dmol exposes the underlying 3Dmol Model via getModel(index)
-        lig_model = view.getModel(1)
-        lig_model.setMatrix(M)
-
-    # H-bond lines
-    for la, pa in hbonds:
-        L = {"x": float(la.coord[0]), "y": float(la.coord[1]), "z": float(la.coord[2])}
-        P = {"x": float(pa.coord[0]), "y": float(pa.coord[1]), "z": float(pa.coord[2])}
-        view.addLine({"start": L, "end": P, "dashed": True, "color": "yellow", "linewidth": 2})
-
-    # Disulfides
-    if show_ss:
-        for a, b in ss_pairs:
-            A = {"x": float(a.coord[0]), "y": float(a.coord[1]), "z": float(a.coord[2])}
-            B = {"x": float(b.coord[0]), "y": float(b.coord[1]), "z": float(b.coord[2])}
-            view.addLine({"start": A, "end": B, "color": "green", "linewidth": 3})
-
-    # Highlight & label bonded residues on the protein model
-    for ch, resi, resn in bonded_residues:
-        view.setStyle({"model": 0, "chain": ch, "resi": int(resi)},
-                      {"stick": {"radius": 0.3, "color": "magenta"}})
-        view.addResLabels({"model": 0, "chain": ch, "resi": int(resi)},
-                          {"fontColor": "white", "fontSize": 12, "backgroundOpacity": 0.6})
-
-    # Zoom to protein for context
-    view.zoomTo({"model": 0})
-    return view, hbonds, bonded_residues, ss_pairs
-
 
 st.markdown("""---
 **Tips** 
@@ -375,6 +316,7 @@ st.markdown("""---
 • Adjust the hydrogen-bond cutoff to explore more/less interactions. 
 • Use *Use tube fallback* if cartoons don’t render on your device.
 """)
+
 
 
 
