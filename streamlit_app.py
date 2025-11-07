@@ -28,6 +28,14 @@ use_tube = st.sidebar.toggle("Use tube fallback", value=False)
 show_disulfides = st.sidebar.toggle("Show disulfides", value=True)
 run_btn = st.sidebar.button("Render / Recompute")
 
+st.sidebar.markdown("### Move ligand")
+tx = st.sidebar.slider("Translate X (Å)", -15.0, 15.0, 0.0, 0.1)
+ty = st.sidebar.slider("Translate Y (Å)", -15.0, 15.0, 0.0, 0.1)
+tz = st.sidebar.slider("Translate Z (Å)", -15.0, 15.0, 0.0, 0.1)
+rx = st.sidebar.slider("Rotate X (°)", -180.0, 180.0, 0.0, 1.0)
+ry = st.sidebar.slider("Rotate Y (°)", -180.0, 180.0, 0.0, 1.0)
+rz = st.sidebar.slider("Rotate Z (°)", -180.0, 180.0, 0.0, 1.0)
+
 # ---------------- Helpers ----------------
 @st.cache_data(show_spinner=False, ttl=3600)
 def fetch_pdb_text(pdb_id: str) -> str:
@@ -307,6 +315,7 @@ st.markdown("""---
 • Adjust the hydrogen-bond cutoff to explore more/less interactions. 
 • Use *Use tube fallback* if cartoons don’t render on your device.
 """)
+
 
 
 
