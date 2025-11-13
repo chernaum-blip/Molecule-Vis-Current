@@ -1,7 +1,10 @@
+import streamlit as st
+
+# MUST be first Streamlit command:
+st.set_page_config(page_title="Ligand H-bonds & Disulfides", layout="wide")
 
 import io
 from typing import List, Tuple, Set
-import streamlit as st
 import py3Dmol
 import urllib.request
 import pandas as pd
@@ -662,6 +665,7 @@ html = view._make_html()
 st.components.v1.html(html, height=720, scrolling=False)
 
 # (keep your two columns with the tables below, unchanged)
+
 
 
 
