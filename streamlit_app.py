@@ -37,6 +37,14 @@ rx = st.sidebar.slider("Rotate X (°)", -180.0, 180.0, 0.0, 1.0, key="lig_rx")
 ry = st.sidebar.slider("Rotate Y (°)", -180.0, 180.0, 0.0, 1.0, key="lig_ry")
 rz = st.sidebar.slider("Rotate Z (°)", -180.0, 180.0, 0.0, 1.0, key="lig_rz")
 
+st.sidebar.markdown("### Move protein")
+ptx = st.sidebar.slider("Protein Translate X (Å)", -15.0, 15.0, 0.0, 0.1, key="prot_tx")
+pty = st.sidebar.slider("Protein Translate Y (Å)", -15.0, 15.0, 0.0, 0.1, key="prot_ty")
+ptz = st.sidebar.slider("Protein Translate Z (Å)", -15.0, 15.0, 0.0, 0.1, key="prot_tz")
+prx = st.sidebar.slider("Protein Rotate X (°)", -180.0, 180.0, 0.0, 1.0, key="prot_rx")
+pry = st.sidebar.slider("Protein Rotate Y (°)", -180.0, 180.0, 0.0, 1.0, key="prot_ry")
+prz = st.sidebar.slider("Protein Rotate Z (°)", -180.0, 180.0, 0.0, 1.0, key="prot_rz")
+
 # ---------------- Helpers ----------------
 @st.cache_data(show_spinner=False, ttl=3600)
 def fetch_pdb_text(pdb_id: str) -> str:
@@ -315,3 +323,4 @@ st.markdown("""---
 • Adjust the hydrogen-bond cutoff to explore more/less interactions.  
 • Use *Use tube fallback* if cartoons don’t render on your device.
 """)
+
