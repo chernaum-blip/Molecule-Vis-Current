@@ -29,21 +29,12 @@ show_disulfides = st.sidebar.toggle("Show disulfides", value=True)
 run_btn = st.sidebar.button("Render / Recompute")
 
 st.sidebar.markdown("### Move ligand")
-tx = st.sidebar.slider("Translate X (Å)", -15.0, 15.0, 0.0, 0.1)
-ty = st.sidebar.slider("Translate Y (Å)", -15.0, 15.0, 0.0, 0.1)
-tz = st.sidebar.slider("Translate Z (Å)", -15.0, 15.0, 0.0, 0.1)
-rx = st.sidebar.slider("Rotate X (°)", -180.0, 180.0, 0.0, 1.0)
-ry = st.sidebar.slider("Rotate Y (°)", -180.0, 180.0, 0.0, 1.0)
-rz = st.sidebar.slider("Rotate Z (°)", -180.0, 180.0, 0.0, 1.0)
-
-
-st.sidebar.markdown("### Move ligand")
-tx = st.sidebar.slider("Translate X (Å)", -15.0, 15.0, 0.0, 0.1)
-ty = st.sidebar.slider("Translate Y (Å)", -15.0, 15.0, 0.0, 0.1)
-tz = st.sidebar.slider("Translate Z (Å)", -15.0, 15.0, 0.0, 0.1)
-rx = st.sidebar.slider("Rotate X (°)", -180.0, 180.0, 0.0, 1.0)
-ry = st.sidebar.slider("Rotate Y (°)", -180.0, 180.0, 0.0, 1.0)
-rz = st.sidebar.slider("Rotate Z (°)", -180.0, 180.0, 0.0, 1.0)
+tx = st.sidebar.slider("Translate X (Å)", -15.0, 15.0, 0.0, 0.1, key="lig_tx")
+ty = st.sidebar.slider("Translate Y (Å)", -15.0, 15.0, 0.0, 0.1, key="lig_ty")
+tz = st.sidebar.slider("Translate Z (Å)", -15.0, 15.0, 0.0, 0.1, key="lig_tz")
+rx = st.sidebar.slider("Rotate X (°)", -180.0, 180.0, 0.0, 1.0, key="lig_rx")
+ry = st.sidebar.slider("Rotate Y (°)", -180.0, 180.0, 0.0, 1.0, key="lig_ry")
+rz = st.sidebar.slider("Rotate Z (°)", -180.0, 180.0, 0.0, 1.0, key="lig_rz")
 
 # ---------------- Helpers ----------------
 @st.cache_data(show_spinner=False, ttl=3600)
@@ -671,6 +662,7 @@ html = view._make_html()
 st.components.v1.html(html, height=720, scrolling=False)
 
 # (keep your two columns with the tables below, unchanged)
+
 
 
 
